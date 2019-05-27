@@ -40,5 +40,5 @@ def ping_host(ip_address):
             return True
     return False
     
-results = (network_scan('192.168.10.0','28'))
+results = (network_scan('192.168.10.0','24'))
 print(results)
