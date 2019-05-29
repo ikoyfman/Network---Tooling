@@ -1,44 +1,27 @@
-import platform
-import os
-import ipaddress
+from ipaddress import IPv4Network
+from subprocess import Popen, PIPE
 
-
-def network_scan(address="192.168.1.0", subnet=str(30)):
-    #Get all usable hosts
+def network_scan(address="192.168.1.0", subnet=str(24)):
+    # Get all usable hosts
     formated_address = address + "/" + subnet
-    hosts = list(ipaddress.IPv4Network(formated_address).hosts())
+    hosts = list(IPv4Network(formated_address).hosts())
 
-    
-    #Ping all hosts capture response
+    # CMD list for 
+    cmd_list = [['ping', '-c', '1', hosts[host].compressed]
+                for host in range(0, len(hosts))]
+
+    # Ping all hosts capture response
     results = {}
-    for host in hosts:
-        ping_result = ping_host(host)
-        if ping_result == True:
-            results.setdefault(host.compressed,True)
+    procs_list = [Popen(cmd, stdout=PIPE) for cmd in cmd_list]
+    for proc in procs_list:
+        proc.wait()
+        if proc.returncode == 0:
+            results.setdefault(proc.args[3], True)
         else:
-            results.setdefault(host.compressed,False)
-
+            results.setdefault(proc.args[3], False)
+    
     return results
 
-def ping_host(ip_address):
-    #Figure out Operating system
-    oper = platform.system()
-    if (oper == "Windows"):
-        ping = "ping -n 1"
-    elif (oper == "Linux"):
-        ping = "ping -c 1"
-    else:
-        ping = "ping -c 1"
-
-    #Format ping for operating system
-    formated_ping = ping + ' ' + str(ip_address)
-    print(formated_ping)
-    #Use OS to ping and look for ttl.
-    response = os.popen(formated_ping)
-    for text in response:
-        if text.count('ttl='):
-            return True
-    return False
     
-results = (network_scan('192.168.10.0','24'))
+results = (network_scan('192.168.10.0','29'))
 print(results)
