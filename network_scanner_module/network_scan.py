@@ -22,6 +22,6 @@ def network_scan(address="192.168.1.0", subnet=str(24)):
     
     return results
 
-    
-results = (network_scan('192.168.10.0','29'))
-print(results)
+if __name__ == "__main__":
+    results = (network_scan('192.168.10.0','29'))
+    print(results)
