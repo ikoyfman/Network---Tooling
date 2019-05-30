@@ -1,13 +1,26 @@
+from platform import system
 from ipaddress import IPv4Network
 from subprocess import Popen, PIPE
 
 def network_scan(address="192.168.1.0", subnet=str(24)):
+    """
+    This function is designed to use your OS ping command to ping hosts.
+    Will return a dictionary of True and False for each ip address in the subnet
+    """
+
     # Get all usable hosts
     formated_address = address + "/" + subnet
     hosts = list(IPv4Network(formated_address).hosts())
 
+
+    # Get your OS
+    if system() == 'Windows':
+        ping_arg = '-n'
+    else:
+        ping_arg = '-c'
+
     # CMD list for 
-    cmd_list = [['ping', '-c', '1', hosts[host].compressed]
+    cmd_list = [['ping', ping_arg, '1', hosts[host].compressed]
                 for host in range(0, len(hosts))]
 
     # Ping all hosts capture response
@@ -23,5 +36,5 @@ def network_scan(address="192.168.1.0", subnet=str(24)):
     return results
 
 if __name__ == "__main__":
-    results = (network_scan('192.168.10.0','29'))
+    results = (network_scan('192.168.10.0','24'))
     print(results)
