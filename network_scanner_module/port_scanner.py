@@ -10,20 +10,12 @@ def pscan(ip_name, port, type="SOCK_STREAM"):
             scanner.settimeout(.1)
             scanner.connect((str(ip_name), port))
             scanner.close()
-            return "Opened!"
+            return True
         except:
-            return "Closed"
+            return False
 
-    """NOT CURRENTLY WORKING
-    # UDP PORT SCAN
-    if type != "SOCK_STREAM":
-
-        try:
-            scanner = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-            scanner.bind('127.0.0.1',53)
-            scanner.settimeout(2)
-            
-            return "Opened"
-        except:
-            return "Closed"
-    """          
+if __name__ == "__main__":
+    ports = {}
+    for port in range(1,10024):
+        ports[port] = pscan('google.com',port)
+    print(ports)
