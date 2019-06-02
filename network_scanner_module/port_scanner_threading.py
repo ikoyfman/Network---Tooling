@@ -1,48 +1,65 @@
 # This script runs on Python 3
-import socket, threading
+import socket
+import threading
+from multiprocessing import Pool
 
 
-def TCP_connect(ip, port_number, delay, output):
-    TCPsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    TCPsock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    TCPsock.settimeout(delay)
+
+def TCP_connect(port_number, ip='google.com', delay='.5'):
     try:
-        TCPsock.connect((ip, port_number))
-        output[port_number] = 'Listening'
+        scanner = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        scanner.settimeout(1)
+        scanner.connect((str('google.com'), port_number))
+        scanner.close()
+        return True
     except:
-        output[port_number] = ''
+        return False
 
 
+def scan_ports(host_ip, port_start=None, port_end=None,):
+    results = []
 
-def scan_ports(host_ip, delay):
+    if port_start and port_end == None:
+        connection_result = TCP_connect(host_ip, port_start)
+        results.append(
+            {port_start: connection_result}
+        )
 
-    threads = []        # To run TCP_connect concurrently
-    output = {}         # For printing purposes
+    # Prepare list to capture port ranges for multiple ports
+    if port_start != port_end and port_end != None:
+        port_ranges = []
+        end_number = port_start
+        for number in range(port_start, port_end+1):
+            if number % 20 == 0:
+                port_ranges.append((end_number, number))
+                end_number = number + 1
 
-    # Spawning threads to scan ports
-    for i in range(100):
-        t = threading.Thread(target=TCP_connect, args=(host_ip, i, delay, output))
-        threads.append(t)
+        # Go through port ranges
+        for port_range in port_ranges:
+            port_scan_threader(host_ip, port_range)
+            #results.append(port_range_results)
 
-    # Starting threads
-    for i in range(100):
-        threads[i].start()
+    return results
 
-    # Locking the main thread until all threads complete
-    for i in range(100):
-        threads[i].join()
+def _multiprocess_map_helper(param):
+    host_ip = param[0]
+    port_numb = param[1]
+    return TCP_connect(port_numb,host_ip)
 
-    # Printing listening ports from small to large
-    for i in range(100):
-        if output[i] == 'Listening':
-            print(str(i) + ': ' + output[i])
+def port_scan_threader(host_ip, port_range):
+    ports = []
+    for numb in range(port_range[0],port_range[1]+1):
+        host_ip_port = [host_ip,numb]
+        ports.append(host_ip_port)
+    print(ports)
+    p = Pool()
+    result_list = p.map(_multiprocess_map_helper,ports)
+    print(result_list)
 
-
-
-def main():
-    host_ip = input("Enter host IP: ")
-    delay = int(input("How many seconds the socket is going to wait until timeout: "))   
-    scan_ports(host_ip, delay)
 
 if __name__ == "__main__":
-    main()
+    #assert TCP_connect('google.com',80) == True
+    #assert TCP_connect('google.com',53) == False
+
+    print(scan_ports('google.com', 1,100))
+ 
