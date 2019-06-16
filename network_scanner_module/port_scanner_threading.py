@@ -6,7 +6,7 @@ import time
 
 
 
-def TCP_connect(ip, port_number):
+def tcp_connect(ip, port_number):
     try:
         scanner = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         scanner.settimeout(.1)
@@ -17,11 +17,11 @@ def TCP_connect(ip, port_number):
         return False
 
 
-def scan_ports(host_ip, port_start=None, port_end=None,):
+def scan_ports(host_ip, port_start, port_end):
     results = {}
 
     if port_start and port_end == None:
-        connection_result = TCP_connect(host_ip, port_start)
+        connection_result = tcp_connect(host_ip, port_start)
         results[port_start] =  connection_result
 
     # Prepare list to capture port ranges for multiple ports
@@ -36,7 +36,7 @@ def scan_ports(host_ip, port_start=None, port_end=None,):
 def _multiprocess_port_scan_helper(param):
     host_ip = param[0]
     port_numb = param[1]
-    return TCP_connect(host_ip,port_numb)
+    return tcp_connect(host_ip,port_numb)
 
 def port_scan_threader(host_ip, port_range):
     host_ports = []
@@ -59,8 +59,8 @@ def port_scan_threader(host_ip, port_range):
 
 
 if __name__ == "__main__":
-    assert TCP_connect('google.com',80) == True
-    assert TCP_connect('google.com',53) == False
+    assert tcp_connect('google.com',80) == True
+    assert tcp_connect('google.com',53) == False
     
     results = scan_ports('google.com',1,500)
     assert results[443] == True
