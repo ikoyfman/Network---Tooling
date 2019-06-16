@@ -34,7 +34,3 @@ def network_scan(address="192.168.1.0", subnet=str(24)):
             results.setdefault(proc.args[3], False)
     
     return results
-
-if __name__ == "__main__":
-    results = (network_scan('192.168.10.0','24'))
-    print(results)
