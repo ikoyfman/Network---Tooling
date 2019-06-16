@@ -18,7 +18,13 @@ def test_port_scan_multiple():
     assert results[500] == False
 
 def test_ping_scan_google_net():
-    ping1 = network_scan("172.217.7.0","24")
-    assert ping1['172.217.7.14'] == True
+    ping = network_scan("172.217.7.0","24")
+    #172.217.7.14 is google.com
+    assert ping['172.217.7.14'] == True
+
+    ping_name = network_scan('google.com',hostname=True)
+    ping_name1 = network_scan('IKhammer.com',hostname=True)
+    assert ping_name['google.com'] == True
+    assert ping_name1['IKhammer.com'] == False
 
 
