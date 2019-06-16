@@ -8,21 +8,6 @@ def network_scan(address="192.168.1.0", subnet=str(24)):
     Will return a dictionary of True and False for each ip address in the subnet
     """
 
-    #Hostname ping
-    if hostname:
-        if system() == 'Windows':
-            ping_arg = '-n'
-        else:
-            ping_arg = '-c'
-        cmd = ['ping', ping_arg, '1', address]
-        
-        proc = Popen(cmd, stdout=PIPE)
-        proc.wait()
-        if proc.returncode == 0:
-            return {address:True}
-        else:
-            return {address:False}
-
     # Get all usable hosts
     formated_address = address + "/" + subnet
     hosts = list(IPv4Network(formated_address).hosts())
