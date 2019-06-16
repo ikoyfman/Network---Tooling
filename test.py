@@ -1,6 +1,7 @@
 import sys
 import os
 from network_scanner_module.port_scanner_threading import scan_ports,tcp_connect
+from network_scanner_module.network_scan import network_scan
 
 def test_google_open():
     test_ip1 = tcp_connect('google.com',80)
@@ -15,3 +16,9 @@ def test_port_scan_multiple():
     assert results[443] == True
     assert results[80] == True
     assert results[500] == False
+
+def test_ping_scan_google_net():
+    ping1 = network_scan("172.217.7.0","24")
+    assert ping1['172.217.7.14'] == True
+
+
